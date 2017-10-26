@@ -235,6 +235,7 @@ class HasarPrinter(PrinterInterface):
         return self._sendCommand(self.CMD_OPEN_FISCAL_RECEIPT, [type, "T"])
 
     def openTicket(self, defaultLetter="B"):
+        self.deleteAnswerFile()
         if self.model == "320":
             self._sendCommand(self.CMD_OPEN_FISCAL_RECEIPT, [defaultLetter, "T"])
         else:
@@ -319,21 +320,23 @@ class HasarPrinter(PrinterInterface):
                   "m", "1", "T"])
         return reply
 
-
     def getLastNumber(self):
+        if not self.pathFileAnswer.endswith("\\"):
+            self.pathFileAnswer += "\\"
         timeout = time.time() + self.WAIT_TIME
         retries = 30
         answerFile = self.pathFileAnswer + self.outputFileName + ".ans"
         while retries > 0:
             if time.time() > timeout:
                 raise ComunicationError(
-                    "Expiró el tiempo de espera para una respuesta de la impresora. Revise la conexión.")
+                    "Expiró el tiempo de espera para una respuesta de la impresora. Revise la conexión."
+                " Archivo generado {}".format(self.pathFileAnswer + self.outputFileName) )
 
             if isfile(answerFile):
                 with open(answerFile, 'r') as f:
                     lines = f.read().splitlines()
                     last_line = lines[-1]
-                    self.lastNumber = last_line[-1].zfill(8)
+                    self.lastNumber = last_line[34:].zfill(8)
                     return self.lastNumber
             else:
                 time.sleep(1)
@@ -342,7 +345,8 @@ class HasarPrinter(PrinterInterface):
 
         if retries == 0:
             raise ComunicationError(
-                "Expiró los reintentos para una respuesta de la impresora. Revise la conexión.")
+                "Expiró los reintentos para una respuesta de la impresora. Revise la conexión."
+                " Archivo generado {}".format(self.pathFileAnswer + self.outputFileName))
 
     def deleteAnswerFile(self):
         if not self.pathFileAnswer.endswith("\\"):
@@ -366,3 +370,47 @@ class HasarPrinter(PrinterInterface):
         self._savedPayments = []
         self._sendCommand(self.CMD_CREDIT_NOTE_REFERENCE, ["1", reference])
         return self._sendCommand(self.CMD_OPEN_CREDIT_NOTE, [type, "T"])
+
+    def cancelDocument(self):
+        if not hasattr(self, "_currentDocument"):
+            return
+        if self._currentDocument in (self.CURRENT_DOC_TICKET, self.CURRENT_DOC_BILL_TICKET,
+                self.CURRENT_DOC_CREDIT_BILL_TICKET, self.CURRENT_DOC_CREDIT_TICKET):
+            try:
+                status = self._sendCommand(self.CMD_ADD_PAYMENT, ["Cancelar", "0.00", 'C', "1"])
+            except:
+                self.cancelAnyDocument()
+                status = []
+            return status
+        if self._currentDocument in (self.CURRENT_DOC_NON_FISCAL, ):
+            self.printNonFiscalText("CANCELADO")
+            return self.closeDocument()
+        if self._currentDocument in (self.CURRENT_DOC_DNFH, ):
+            self.cancelAnyDocument()
+            status = []
+            return status
+        raise NotImplementedError
+
+    def cancelAnyDocument(self):
+        try:
+            self._sendCommand(self.CMD_CANCEL_ANY_DOCUMENT)
+#            return True
+        except:
+            pass
+        try:
+            self._sendCommand(self.CMD_ADD_PAYMENT, ["Cancelar", "0.00", 'C', '1'])
+            return True
+        except:
+            pass
+        try:
+            self._sendCommand(self.CMD_CLOSE_NON_FISCAL_RECEIPT)
+            return True
+        except:
+            pass
+        try:
+            logging.getLogger().info("Cerrando comprobante con CLOSE")
+            self._sendCommand(self.CMD_CLOSE_FISCAL_RECEIPT)
+            return True
+        except:
+            pass
+        return False
