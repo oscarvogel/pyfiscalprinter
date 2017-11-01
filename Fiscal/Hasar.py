@@ -95,6 +95,8 @@ class HasarPrinter(PrinterInterface):
 
     CMD_REPRINT = 0x99
 
+    CMD_PERCEPTIONS = 0x60
+
     CURRENT_DOC_TICKET = 1
     CURRENT_DOC_BILL_TICKET = 2
     CURRENT_DOC_NON_FISCAL = 3
@@ -115,6 +117,7 @@ class HasarPrinter(PrinterInterface):
                 'generalDiscount': 20,
                 'embarkItem': 108,
                 'receiptText': 106,
+                'perception':20,
                 },
         "320": {'nonFiscalText': 120,
                 'customerName': 50,
@@ -126,6 +129,7 @@ class HasarPrinter(PrinterInterface):
                 'generalDiscount': 50,
                 'embarkItem': 108,
                 'receiptText': 106,
+                'perception':20,
                 }
     }
 
@@ -414,3 +418,12 @@ class HasarPrinter(PrinterInterface):
         except:
             pass
         return False
+
+    def perceptions(self, alicuota=0.00, msg='', amount=0.00):
+        msg = self._formatText(msg, 'perception')
+        if alicuota == 0.00:
+            alicuotaStr = '**.**'
+        else:
+            alicuotaStr = str(float(alicuota)).replace(',', '.')
+        amountStr = str(float(amount)).replace(',', '.')
+        return self._sendCommand(self.CMD_PERCEPTIONS,[alicuotaStr, msg, amountStr])

@@ -48,7 +48,7 @@ class PyFiscalPrinter(object):
 
     @inicializar_y_capturar_excepciones
     def Conectar(self, marca='hasar', modelo='320',
-                 puerto=None, archivo=None,
+                 puerto=None,
                  carpetacomando=None, carpetarespuesta=None):
 
         if marca == 'hasar':
@@ -190,6 +190,10 @@ class PyFiscalPrinter(object):
         else:
             self.trailer.append(ds)
         return True
+
+    @inicializar_y_capturar_excepciones
+    def Percepcion(self, alicuota=0.00, mensaje='', monto=0.00):
+        return self.printer.perceptions(alicuota, mensaje, monto)
 
 if __name__ == '__main__':
     DEBUG = '--debug' in sys.argv

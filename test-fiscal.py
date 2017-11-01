@@ -65,17 +65,17 @@ carpetarespuesta = join("u:\\", "respues")
 archivo = 'PC-Oscar'
 
 controlador.Conectar(marca=marca, modelo=modelo,
-                     archivo=archivo, carpetacomando=carpetacomando,
+                     carpetacomando=carpetacomando,
                      carpetarespuesta=carpetarespuesta)
 controlador.FijarTextoCabecera("Facundo Quiroga 298")
 controlador.FijarTextoPie("Contado efectivo 15% descuento")
 
-tipo_cbte = 83 if not "--nc" in sys.argv else 3
+tipo_cbte = 1
 tipo_doc = 80;
 nro_doc = "20267565393"
 nombre_cliente = 'Joao Da Silva'
 domicilio_cliente = 'Rua 76 km 34.5'
-tipo_responsable = 5 if not "--nc" in sys.argv else 1  # R.I. ("A)
+tipo_responsable = 1
 referencia = None if not "--nc" in sys.argv else "F 1234"
 
 ok = controlador.AbrirComprobante(tipo_cbte, tipo_responsable,
@@ -90,6 +90,16 @@ bonif = 0.00
 alic_iva = 21.00
 importe = 121.00
 ok = controlador.ImprimirItem(ds, qty, importe, alic_iva)
+
+codigo = "P0002"
+ds = "Descripcion del producto P0002"
+qty = 1.00
+precio = 100.00
+bonif = 0.00
+alic_iva = 21.00
+importe = 121.00
+ok = controlador.ImprimirItem(ds, qty, importe, alic_iva)
+ok = controlador.Percepcion(0.00,"RG 031/2012 DGR",121.23)
 ok = controlador.ImprimirPago("efectivo", importe)
 ok = controlador.CerrarComprobante()
 print("Comprobante generado {}".format(controlador.factura))

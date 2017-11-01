@@ -200,3 +200,7 @@ class PrinterInterface:
     def openDrawer(self):
         """Abrir cajón del dinero - No es mandatory implementarlo"""
         pass
+
+    def perceptions(self, alicuota=0.00, msg='', amount=0.00):
+        """Envia percepciones al impresor fiscal"""
+        pass
