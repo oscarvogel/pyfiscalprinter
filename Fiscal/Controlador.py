@@ -114,6 +114,8 @@ class PyFiscalPrinter(object):
                         "items": [], "pagos": []}
         printer = self.printer
 
+        if isinstance(nro_doc, int):#en caso de que sea numerico lo convierto a caracter
+            nro_doc = str(nro_doc)
         # mapear el tipo de comprobante según RG1785/04:
         cbte_fiscal = self.cbte_fiscal_map[int(tipo_cbte)]
         letra_cbte = cbte_fiscal[-1] if len(cbte_fiscal) > 1 else None

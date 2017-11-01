@@ -425,5 +425,5 @@ class HasarPrinter(PrinterInterface):
             alicuotaStr = '**.**'
         else:
             alicuotaStr = str(float(alicuota)).replace(',', '.')
-        amountStr = str(float(amount)).replace(',', '.')
+        amountStr = str(float(round(amount, 2))).replace(',', '.')
         return self._sendCommand(self.CMD_PERCEPTIONS,[alicuotaStr, msg, amountStr])

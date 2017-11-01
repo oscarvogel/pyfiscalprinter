@@ -204,3 +204,10 @@ class PrinterInterface:
     def perceptions(self, alicuota=0.00, msg='', amount=0.00):
         """Envia percepciones al impresor fiscal"""
         pass
+
+    CPBTE_FACTURA_A = 1
+    CPBTE_DEBITO_A = 2
+    CPBTE_CREDITO_A = 3
+    CPBTE_FACTURA_B = 6
+    CPBTE_DEBITO_B = 7
+    CPBTE_CREDITO_B = 8
